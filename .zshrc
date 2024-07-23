@@ -114,8 +114,13 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-export NVM_DIR=~/.nvm
-source $(brew --prefix nvm)/nvm.sh
+
+# If on mac the nvm dependency is installed via brew (This would need to be changed in the dotfiles setup script)
+if [[ $OSTYPE == 'darwin'* ]]; then
+	export NVM_DIR=~/.nvm
+	source $(brew --prefix nvm)/nvm.sh
+fi
+
 alias ls="ls -la"source ~/powerlevel10k/powerlevel10k.zsh-theme
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
@@ -146,9 +151,11 @@ function cd() {
 cd .
 
 # Load random scripts from zshrc folder
-for FILE in ~/zshrc/*; do
-    source $FILE
-done
+if [[ -e ~/zsh ]]; then
+	for FILE in ~/zshrc/*; do
+	    source $FILE
+	done
+fi
 
 # Random
 alias zshrc="nvim ~/.zshrc"
@@ -163,3 +170,4 @@ alias nconf="cd ~/.config/nvim && nvim ."
 # fzf
 # quickly Find folders in the repos dir using ctrl + f
  # bindkey -s '^f' 'tmux new -c $(find ~/repos -type d \\( -name node_modules -o -name .git -o -name .venv \\) -prune -o -print | fzf)\n'
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
