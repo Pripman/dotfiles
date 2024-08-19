@@ -18,6 +18,9 @@ vim.cmd 'set clipboard=unnamed'
 vim.g.mapleader = " "
 
 -- go to previous open buffer
+vim.keymap.set("i", "jj", '<Esc>', { remap = false })
+
+-- go to previous open buffer
 vim.keymap.set("n", "<leader>b", '<cmd>:e#<cr>', { remap = false })
 
 -- go to previous buffer

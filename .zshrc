@@ -171,3 +171,6 @@ alias nconf="cd ~/.config/nvim && nvim ."
 # quickly Find folders in the repos dir using ctrl + f
  # bindkey -s '^f' 'tmux new -c $(find ~/repos -type d \\( -name node_modules -o -name .git -o -name .venv \\) -prune -o -print | fzf)\n'
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# enable vim mode om command line
+set -o vi
