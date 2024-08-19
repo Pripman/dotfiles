@@ -2,6 +2,14 @@ vim.cmd 'set number relativenumber'
 vim.cmd 'set nowrap'
 vim.cmd 'setlocal spell spelllang=en_us'
 
+-- adds transparency to the background
+vim.cmd [[
+  highlight Normal guibg=none
+  highlight NonText guibg=none
+  highlight Normal ctermbg=none
+  highlight NonText ctermbg=none
+]]
+
 
 -- set yank to copy to clipboard
 vim.cmd 'set clipboard=unnamed'
@@ -30,6 +38,21 @@ vim.keymap.set('n', '<leader>dd', vim.diagnostic.open_float, { remap = false })
 -- toggle relativenumber
 vim.keymap.set("n", "<leader>r", '<cmd>:set nonumber relativenumber<cr>', { remap = false })
 vim.keymap.set("n", "<leader>n", '<cmd>:set number norelativenumber<cr>', { remap = false })
+
+-- save
+vim.keymap.set("n", "<leader>s", "<Esc>:w<cr>", { remap="false", desc = "Save" })
+
+-- autosave when leaving a file
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
+  callback = function()
+    if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
+      vim.api.nvim_command('silent update')
+    end
+  end,
+})
+
+
+
 
 -- set up lazy package manager
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
