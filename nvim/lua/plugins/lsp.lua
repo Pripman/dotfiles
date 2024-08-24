@@ -26,12 +26,13 @@ return {
 			require 'mason-lspconfig'.setup({
 				-- Replace the language servers listed here
 				-- with the ones you want to install
-				ensure_installed = { 'tsserver', 'ruff_lsp', 'pyright', 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql' },
+				ensure_installed = { 'tsserver', 'ruff_lsp', 'pyright', 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman' },
 				handlers = {
 					lsp_zero.default_setup,
 				}
 			})
 
+			require 'lspconfig'.marksman.setup({})
 			require 'lspconfig'.pyright.setup({})
 			local lspconfig = require("lspconfig")
 			require 'lspconfig'.graphql.setup({

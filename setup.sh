@@ -23,7 +23,7 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 
 
-# If needed on other os add ways to install tmux and nvm
+# If needed on other os add ways to install tmux, nvm and ripgrip
 if [[ $OSTYPE == 'darwin'* ]]; then
 	# Install Tmux
 	brew install tmux
@@ -32,6 +32,9 @@ if [[ $OSTYPE == 'darwin'* ]]; then
 
 	# install nvm
 	brew install nvm
+
+	# install ripgrep (dependency to teleskope plugin for neovim)
+	brew install ripgrep
 fi
 
 
