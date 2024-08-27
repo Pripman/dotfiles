@@ -1,0 +1,61 @@
+{
+	"Print to console": {
+		"prefix": "log",
+		"body": [
+			"console.log('$1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	},
+	"Create arrow function": {
+		"prefix": "af",
+		"body": [
+			"const $1 = ($2):$3 => {",
+			"\t$4",
+			"};"
+		],
+		"description": "Create an arrow function"
+	},
+	"Create arrow function with props": {
+		"prefix": "afpr",
+		"body": [
+			"type $1Props = {$2}",
+			"export const $1 = ({$2}:$1Props):$3 => {",
+			"\t$4",
+			"};"
+		],
+		"description": "Create an arrow function with prop with props"
+	},
+	"Create arrow function with props and return type": {
+		"prefix": "afprr",
+		"body": [
+			"type $1Props = {$2}",
+			"type $3 = {$4}",
+			"export const $1 = ({$2}:$1Props):$3 => {",
+			"\t$5",
+			"};"
+		],
+		"description": "Create an arrow function with prop with props and a return type"
+	},
+	"Create react component": {
+		"prefix": "rc",
+		"body": [
+			"type $1Props = {$2}",
+			"export const $1 = ({$2}:$1Props):JSX.Element => {",
+			"return \t$4",
+			"};"
+		],
+		"description": "Create a react component"
+	},
+	"Create react hook": {
+		"prefix": "rh",
+		"body": [
+			"type $1Props = {$2}",
+			"type $1Hook = {$3}",
+			"export const $1 = ({$2}:$1Props):$1Hook => {",
+			"\t$4",
+			"};"
+		],
+		"description": "Create a react component"
+	}
+}

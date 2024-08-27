@@ -22,7 +22,11 @@ return {
 				ls.change_choice(1)
 			end
 		end, {silent = true})
-		require("luasnip.loaders.from_vscode").lazy_load()
+		require("luasnip.loaders.from_vscode").lazy_load(
+
+		{ paths={ "~/repos/dotfiles/nvim/snippets" }}
+
+		)
 	end,
 
 }
