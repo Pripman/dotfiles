@@ -10,8 +10,8 @@ return {
 			-- },
 			sections = {
 				lualine_a = {'branch'},
-				lualine_b = {'buffers'},
-				lualine_c = {{'filename', path = 1}},
+				lualine_b = {{'filename', file_status = true}},
+				lualine_c = {'tabs'},
 				lualine_x = {'filetype'},
 				lualine_y = {'progress'},
 				lualine_z = {'location'}

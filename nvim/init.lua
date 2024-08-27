@@ -1,7 +1,16 @@
+-- general
 vim.cmd 'set number relativenumber'
 vim.cmd 'set nowrap'
 vim.cmd 'setlocal spell spelllang=en_us'
 
+-- Needed for vim wiki
+vim.cmd[[
+	set nocompatible
+	filetype plugin on
+	syntax on
+	let g:vimwiki_list = [{'path': '~/vimwiki/', 'syntax': 'markdown', 'ext': 'md'}]
+	let g:vimwiki_global_ext = 0
+]]
 -- adds transparency to the background
 vim.cmd [[
   highlight Normal guibg=none

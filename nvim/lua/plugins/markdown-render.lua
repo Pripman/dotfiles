@@ -6,7 +6,10 @@ return {
 	 dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
 	 config = function()
 		require('render-markdown').setup({
-			render_modes= {'i', 'v', 'n' ,'c'}
+			render_modes= {'i', 'v', 'n' ,'c'},
+			file_types = {'markdown', 'vimwiki'},
+
 		})
+			vim.treesitter.language.register('markdown', 'vimwiki')
 	 end
 }
