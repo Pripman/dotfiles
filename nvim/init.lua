@@ -39,7 +39,7 @@ vim.keymap.set("n", "<leader>j", '<cmd>:bp<cr>', { remap = false })
 vim.keymap.set("n", "<leader>k", '<cmd>:bn<cr>', { remap = false })
 
 -- closse buffer
-vim.keymap.set("n", "<leader>w", '<cmd>:bd<cr>', { remap = false })
+vim.keymap.set("n", "<leader>q", '<cmd>:bd<cr>', { remap = false })
 
 -- enable normal mode in terminal
 vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
