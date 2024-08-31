@@ -133,6 +133,15 @@ return {
 					{ name = 'buffer' },
 				}
 			})
+			cmp.setup.filetype('typescript', {
+				sources = {
+					{ name = "luasnip" },
+					{ name = "nvim_lsp",               keyword_length = 1 },
+					{ name = "nvim_lsp_signature_help" },
+					{ name = "path" },
+					{ name = "nvim_lua" }
+				}
+			})
 
 		end,
 		branch = 'v3.x'
