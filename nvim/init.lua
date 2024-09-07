@@ -9,7 +9,7 @@ vim.cmd[[
 	filetype plugin on
 	syntax on
 	let g:vimwiki_list = [{'path': '~/vimwiki/', 'syntax': 'markdown', 'ext': 'md'}]
-	let g:vimwiki_global_ext = 0
+	let g:vimwiki_global_ext = 1
 ]]
 -- adds transparency to the background
 vim.cmd [[
