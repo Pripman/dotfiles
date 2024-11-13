@@ -26,7 +26,7 @@ return {
 			require 'mason-lspconfig'.setup({
 				-- Replace the language servers listed here
 				-- with the ones you want to install
-				ensure_installed = {  'ruff_lsp', 'pyright', 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman' },
+				ensure_installed = { 'pyright', 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service'},
 				handlers = {
 					lsp_zero.default_setup,
 				}
@@ -40,8 +40,7 @@ return {
     			root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
 			})
 			require 'lspconfig'.typos_lsp.setup({})
-			-- require 'lspconfig'.ruff_lsp.setup({})
-			-- require 'lspconfig'.tsserver.setup({})
+			require 'lspconfig'.docker_compose_language_service.setup({})
 			require 'lspconfig'.eslint.setup({
 				on_attach = function(client, bufnr)
 					vim.api.nvim_create_autocmd("BufWritePre", {

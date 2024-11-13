@@ -160,6 +160,9 @@ fi
 # Random
 alias zshrc="nvim ~/.zshrc"
 
+# Structurizr
+export PATH="$HOME/cli-tools:$PATH"
+
 #neovim
 export PATH="$HOME/nvim-macos/bin:$PATH"
 export MYVIMRC="~/.config/nvim"
@@ -167,10 +170,17 @@ alias n="nvim ."
 alias nconf="cd ~/.config/nvim && nvim ."
 
 
-# fzf
-# quickly Find folders in the repos dir using ctrl + f
- # bindkey -s '^f' 'tmux new -c $(find ~/repos -type d \\( -name node_modules -o -name .git -o -name .venv \\) -prune -o -print | fzf)\n'
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # enable vim mode om command line
 set -o vi
+
+# fzf
+search_repos() {
+	command find ~/repos \( -name 'node_modules' -o -name '.git' \)  -prune  -o -print | fzf --preview 'cat {}' | xargs nvim;
+}
+zle -N search_repos
+bindkey "^F" search_repos
+
+# To customize prompt, run `p10k configure` or edit ~/repos/dotfiles/.p10k.zsh.
+[[ ! -f ~/repos/dotfiles/.p10k.zsh ]] || source ~/repos/dotfiles/.p10k.zsh

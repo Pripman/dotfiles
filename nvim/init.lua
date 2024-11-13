@@ -26,7 +26,7 @@ vim.cmd 'set clipboard=unnamed'
 -- set leader key to space
 vim.g.mapleader = " "
 
--- go to previous open buffer
+-- Use jj to go to normal mode
 vim.keymap.set("i", "jj", '<Esc>', { remap = false })
 
 -- go to previous open buffer
@@ -40,6 +40,25 @@ vim.keymap.set("n", "<leader>k", '<cmd>:bn<cr>', { remap = false })
 
 -- closse buffer
 vim.keymap.set("n", "<leader>q", '<cmd>:bd<cr>', { remap = false })
+
+-- Move paane right
+vim.keymap.set("n", "<C-l>", '<C-w>l', { remap = false })
+
+-- Move paane right
+vim.keymap.set("n", "<C-h>", '<C-w>h', { remap = false })
+
+-- Move paane down 
+vim.keymap.set("n", "<C-j>", '<C-w>j', { remap = false })
+
+-- Move paane up
+vim.keymap.set("n", "<C-k>", '<C-w>k', { remap = false })
+
+-- split window vertically
+vim.keymap.set("n", "<leader>v", '<C-w>v', { remap = false })
+
+-- split window horizontally 
+vim.keymap.set("n", "<leader>h", '<C-w>s', { remap = false })
+
 
 -- enable normal mode in terminal
 vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
