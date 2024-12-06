@@ -134,6 +134,11 @@ alias py="python3"
 alias pip="python3 -m pip"
 export PATH="$HOME/bin:$PATH"
 
+## pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
 ## Activate virtual env if exist in folder
 function cd() {
 	# Insert below to deactivate when exiting folder
@@ -158,7 +163,7 @@ if [[ -e ~/zsh ]]; then
 fi
 
 # Random
-alias zshrc="nvim ~/.zshrc"
+alias rc="nvim ~/.zshrc"
 
 # Structurizr
 export PATH="$HOME/cli-tools:$PATH"
@@ -177,10 +182,15 @@ set -o vi
 
 # fzf
 search_repos() {
-	command find ~/repos \( -name 'node_modules' -o -name '.git' \)  -prune  -o -print | fzf --preview 'cat {}' | xargs nvim;
+	command find ~/repos \( -name 'node_modules' -o -name '.git' \)  -prune  -o -print | fzf --preview 'cat {}' | xargs -S1024 -I % nvim %;
+}
+search_repos_and_session() {
+        command find  ~/repos -maxdepth 2 \( -name 'node_modules' -o -name '.git' \) -prune -o -type d  -print | fzf | xargs -S1024 -I{} sh -c 'tmux new -Ads {} -c {} && echo "opening as session {}" && tmux switch -t {}'
 }
 zle -N search_repos
+zle -N search_repos_and_session
 bindkey "^F" search_repos
+bindkey "^P" search_repos_and_session
 
 # To customize prompt, run `p10k configure` or edit ~/repos/dotfiles/.p10k.zsh.
 [[ ! -f ~/repos/dotfiles/.p10k.zsh ]] || source ~/repos/dotfiles/.p10k.zsh
