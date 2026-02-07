@@ -26,21 +26,56 @@ return {
 			require 'mason-lspconfig'.setup({
 				-- Replace the language servers listed here
 				-- with the ones you want to install
-				ensure_installed = { 'pyright', 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service'},
+				ensure_installed = { 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service', 'ruff', 'biome', 'helm_ls', 'pyright' },
 				handlers = {
 					lsp_zero.default_setup,
 				}
 			})
 
-			require 'lspconfig'.marksman.setup({})
 			require 'lspconfig'.pyright.setup({})
+
+			require 'lspconfig'.marksman.setup({})
+
+			require 'lspconfig'.helm_ls.setup({
+				settings = {
+					['helm-ls'] = {
+						yamlls = {
+							path = "yaml-language-server",
+						}
+					}
+				}
+			})
+			require 'lspconfig'.ruff.setup({
+				init_options = {
+					configurationPreference = "filesystemFirst"
+				},
+				on_attach = function(client, bufnr)
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = bufnr,
+						-- command = "!ruff check --fix %",
+					})
+				end,
+			})
 			local lspconfig = require("lspconfig")
 			require 'lspconfig'.graphql.setup({
 				filetypes = { 'graphql' },
-    			root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
+				root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
 			})
 			require 'lspconfig'.typos_lsp.setup({})
 			require 'lspconfig'.docker_compose_language_service.setup({})
+			require 'lspconfig'.biome.setup({
+				filetypes = { 'ts', 'tsx' },
+				root_dir = lspconfig.util.root_pattern("package.json"),
+				on_attach = function(client, bufnr)
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = bufnr,
+						callback = function()
+							vim.lsp.buf.format()
+						end
+					})
+				end,
+
+			})
 			require 'lspconfig'.eslint.setup({
 				on_attach = function(client, bufnr)
 					vim.api.nvim_create_autocmd("BufWritePre", {
@@ -50,7 +85,7 @@ return {
 				end,
 			})
 			require 'lspconfig'.yamlls.setup({
-				filetypes = { 'yaml', 'yml' }
+				filetypes = { 'yaml', 'yml' },
 
 			})
 			require 'lspconfig'.lua_ls.setup({
@@ -60,23 +95,24 @@ return {
 							globals = { "vim" }
 						}
 					}
-				}
+				},
+				on_attach = function(client, bufnr)
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer   = bufnr,
+						callback = function()
+							vim.lsp.buf.format()
+						end
+					})
+				end,
 			})
 
 			local cmp = require 'cmp'
-			local luasnip = require("luasnip")
 
 
 
 			cmp.setup({
-				snippet = {
-					expand = function(args)
-						require'luasnip'.lsp_expand(args.body)
-					end
-				},
 
 				sources = cmp.config.sources({
-					{ name = "luasnip" },
 					{ name = "nvim_lsp",               keyword_length = 1 },
 					{ name = "nvim_lsp_signature_help" },
 					{ name = "path" },
@@ -88,13 +124,9 @@ return {
 				mapping = cmp.mapping.preset.insert({
 					['<CR>'] = cmp.mapping(function(fallback)
 						if cmp.visible() then
-							if luasnip.expandable() then
-								luasnip.expand()
-							else
-								cmp.confirm({
-									select = true,
-								})
-							end
+							cmp.confirm({
+								select = true,
+							})
 						else
 							fallback()
 						end
@@ -114,18 +146,15 @@ return {
 			})
 			cmp.setup.filetype('typescript', {
 				sources = {
-					{ name = "luasnip" },
 					{ name = "nvim_lsp",               keyword_length = 1 },
 					{ name = "nvim_lsp_signature_help" },
 					{ name = "path" },
 					{ name = "nvim_lua" }
 				}
 			})
-
 		end,
 		branch = 'v3.x'
 	},
 	{ 'neovim/nvim-lspconfig' },
 	{ 'hrsh7th/cmp-nvim-lsp' },
-	{ 'hrsh7th/nvim-cmp', dependencies={'L3MON4D3/LuaSnip'} },
 }

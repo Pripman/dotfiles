@@ -4,7 +4,7 @@ vim.cmd 'set nowrap'
 vim.cmd 'setlocal spell spelllang=en_us'
 
 -- Needed for vim wiki
-vim.cmd[[
+vim.cmd [[
 	set nocompatible
 	filetype plugin on
 	syntax on
@@ -26,8 +26,8 @@ vim.cmd 'set clipboard=unnamed'
 -- set leader key to space
 vim.g.mapleader = " "
 
--- Use jj to go to normal mode
-vim.keymap.set("i", "jj", '<Esc>', { remap = false })
+-- Use jk to go to normal mode
+vim.keymap.set("i", "jk", '<Esc>', { remap = false })
 
 -- go to previous open buffer
 vim.keymap.set("n", "<leader>b", '<cmd>:e#<cr>', { remap = false })
@@ -47,7 +47,7 @@ vim.keymap.set("n", "<C-l>", '<C-w>l', { remap = false })
 -- Move paane right
 vim.keymap.set("n", "<C-h>", '<C-w>h', { remap = false })
 
--- Move paane down 
+-- Move paane down
 vim.keymap.set("n", "<C-j>", '<C-w>j', { remap = false })
 
 -- Move paane up
@@ -56,12 +56,12 @@ vim.keymap.set("n", "<C-k>", '<C-w>k', { remap = false })
 -- split window vertically
 vim.keymap.set("n", "<leader>v", '<C-w>v', { remap = false })
 
--- split window horizontally 
+-- split window horizontally
 vim.keymap.set("n", "<leader>h", '<C-w>s', { remap = false })
 
 
--- enable normal mode in terminal
-vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
+-- enable normal mode in terminal (might be sketchy)
+-- vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
 
 -- open diagnostic in floating window
 vim.keymap.set('n', '<leader>dd', vim.diagnostic.open_float, { remap = false })
@@ -71,15 +71,15 @@ vim.keymap.set("n", "<leader>r", '<cmd>:set nonumber relativenumber<cr>', { rema
 vim.keymap.set("n", "<leader>n", '<cmd>:set number norelativenumber<cr>', { remap = false })
 
 -- save
-vim.keymap.set("n", "<leader>s", "<Esc>:w<cr>", { remap="false", desc = "Save" })
+vim.keymap.set("n", "<leader>s", "<Esc>:w<cr>", { remap = "false", desc = "Save" })
 
 -- autosave when leaving a file
 vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
-  callback = function()
-    if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
-      vim.api.nvim_command('silent update')
-    end
-  end,
+	callback = function()
+		if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
+			vim.api.nvim_command('silent update')
+		end
+	end,
 })
 
 

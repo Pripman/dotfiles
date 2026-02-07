@@ -3,5 +3,6 @@ return {
 	"tpope/vim-commentary",
 	"xiyaowong/transparent.nvim",
 	"nvim-telescope/telescope.nvim",
-	"vimwiki/vimwiki"
+	"vimwiki/vimwiki",
+	"towolf/vim-helm",
 }

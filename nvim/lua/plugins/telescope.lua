@@ -7,10 +7,10 @@ return {
 		vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
 		vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 		vim.keymap.set('n', '<leader>fs', builtin.git_status, {})
-		vim.keymap.set('n', '<leader>fd', builtin.git_branches, {})
+		vim.keymap.set('n', '<leader>gb', builtin.git_branches, {})
 		vim.keymap.set('n', '<leader>fr', builtin.lsp_references, { noremap = true, silent = true })
 		vim.keymap.set('n', '<leader>fw', function()
-			builtin.find_files({cwd="~/vimwiki"})
+			builtin.find_files({ cwd = "~/vimwiki" })
 		end)
 	end,
 	dependencies = { 'nvim-lua/plenary.nvim', as = "plenary" }
