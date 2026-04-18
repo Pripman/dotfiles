@@ -127,6 +127,9 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Docker
+export PATH="$HOME/.docker/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
 
 
 # Python
@@ -137,19 +140,20 @@ export PATH="$HOME/bin:$PATH"
 ## pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+eval "$(pyenv init - version)"
 
-## Activate virtual env if exist in folder
+
+## Activate virtual env and/or load nvm node version if exist in folder
 function cd() {
-	# Insert below to deactivate when exiting folder
-  # if [[ -d ./venv ]] ; then
-  #   deactivate
-  # fi
 
   builtin cd $1
 
   if [[ -d ./.venv ]] ; then
     . ./.venv/bin/activate
+  fi
+
+  if [[ -f ./.nvmrc ]] ; then
+    nvm use
   fi
 }
 ## Activate on shell startup
@@ -182,7 +186,7 @@ set -o vi
 
 # fzf
 search_repos() {
-	command find ~/repos \( -name 'node_modules' -o -name '.git' \)  -prune  -o -print | fzf --preview 'cat {}' | xargs -S1024 -I % nvim %;
+	command find ~/repos \( -name 'node_modules' -o -name '.git' -o -name '__pycache__' -o -name '.venv' \)  -prune  -o -print | fzf --preview 'cat {}' | xargs -S1024 -I % nvim %;
 }
 search_repos_and_session() {
         command find  ~/repos -maxdepth 2 \( -name 'node_modules' -o -name '.git' \) -prune -o -type d  -print | fzf | xargs -S1024 -I{} sh -c 'tmux new -Ads {} -c {} && echo "opening as session {}" && tmux switch -t {}'
@@ -194,3 +198,37 @@ bindkey "^P" search_repos_and_session
 
 # To customize prompt, run `p10k configure` or edit ~/repos/dotfiles/.p10k.zsh.
 [[ ! -f ~/repos/dotfiles/.p10k.zsh ]] || source ~/repos/dotfiles/.p10k.zsh
+
+
+# Helper function for decoding JWT tokens
+function decode_jwt() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: decode_jwt <token>"
+    return 1
+  fi
+
+  local token="$1"
+  local header=$(echo "$token" | cut -d '.' -f1 | base64 --decode)
+  local payload=$(echo "$token" | cut -d '.' -f2 | base64 --decode)
+
+  echo "Header:"
+  echo "$header"
+  echo ""
+  echo "Payload:"
+  echo "$payload"
+} 
+
+# pnpm
+export PNPM_HOME="/Users/dkRasPri/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# postgres
+export PATH="/opt/homebrew/opt/libpq@18/bin:$PATH"
+
+
+. "$HOME/.local/bin/env"
+

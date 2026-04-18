@@ -26,17 +26,22 @@ return {
 			require 'mason-lspconfig'.setup({
 				-- Replace the language servers listed here
 				-- with the ones you want to install
-				ensure_installed = { 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service', 'ruff', 'biome', 'helm_ls', 'pyright' },
+				ensure_installed = { 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service', 'ruff', 'biome', 'helm_ls', 'pyright', 'tsgo' },
 				handlers = {
 					lsp_zero.default_setup,
 				}
 			})
 
-			require 'lspconfig'.pyright.setup({})
+			vim.lsp.enable("tsgo")
 
-			require 'lspconfig'.marksman.setup({})
+			-- Configure LSP servers using new vim.lsp.config API
+			vim.lsp.config.pyright = {}
+			vim.lsp.enable('pyright')
 
-			require 'lspconfig'.helm_ls.setup({
+			vim.lsp.config.marksman = {}
+			vim.lsp.enable('marksman')
+
+			vim.lsp.config.helm_ls = {
 				settings = {
 					['helm-ls'] = {
 						yamlls = {
@@ -44,51 +49,55 @@ return {
 						}
 					}
 				}
-			})
-			require 'lspconfig'.ruff.setup({
+			}
+			vim.lsp.enable('helm_ls')
+
+			vim.lsp.config.ruff = {
 				init_options = {
 					configurationPreference = "filesystemFirst"
 				},
 				on_attach = function(client, bufnr)
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						buffer = bufnr,
-						-- command = "!ruff check --fix %",
-					})
-				end,
-			})
-			local lspconfig = require("lspconfig")
-			require 'lspconfig'.graphql.setup({
-				filetypes = { 'graphql' },
-				root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
-			})
-			require 'lspconfig'.typos_lsp.setup({})
-			require 'lspconfig'.docker_compose_language_service.setup({})
-			require 'lspconfig'.biome.setup({
-				filetypes = { 'ts', 'tsx' },
-				root_dir = lspconfig.util.root_pattern("package.json"),
-				on_attach = function(client, bufnr)
-					vim.api.nvim_create_autocmd("BufWritePre", {
-						buffer = bufnr,
 						callback = function()
-							vim.lsp.buf.format()
-						end
+							vim.lsp.buf.format({ name = "ruff" })
+						end,
 					})
 				end,
+			}
+			vim.lsp.enable('ruff')
 
-			})
-			require 'lspconfig'.eslint.setup({
+			vim.lsp.config.graphql = {
+				filetypes = { 'graphql' },
+				root_markers = { ".graphqlconfig", ".graphqlrc", "package.json" },
+			}
+			vim.lsp.enable('graphql')
+
+			vim.lsp.config.typos_lsp = {}
+			vim.lsp.enable('typos_lsp')
+
+			vim.lsp.config.docker_compose_language_service = {}
+			vim.lsp.enable('docker_compose_language_service')
+
+			vim.lsp.config.biome = {}
+			vim.lsp.enable('biome')
+
+			vim.lsp.config.eslint = {
 				on_attach = function(client, bufnr)
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						buffer = bufnr,
 						command = "EslintFixAll",
 					})
 				end,
-			})
-			require 'lspconfig'.yamlls.setup({
-				filetypes = { 'yaml', 'yml' },
+			}
+			vim.lsp.enable('eslint')
 
-			})
-			require 'lspconfig'.lua_ls.setup({
+			vim.lsp.config.yamlls = {
+				filetypes = { 'yaml', 'yml' },
+			}
+			vim.lsp.enable('yamlls')
+
+			vim.lsp.config.lua_ls = {
 				settings = {
 					Lua = {
 						diagnostics = {
@@ -104,7 +113,8 @@ return {
 						end
 					})
 				end,
-			})
+			}
+			vim.lsp.enable('lua_ls')
 
 			local cmp = require 'cmp'
 
@@ -156,5 +166,7 @@ return {
 		branch = 'v3.x'
 	},
 	{ 'neovim/nvim-lspconfig' },
+	{ "hrsh7th/nvim-cmp" },
 	{ 'hrsh7th/cmp-nvim-lsp' },
+	{ "L3MON4D3/LuaSnip" }
 }

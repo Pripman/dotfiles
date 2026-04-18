@@ -3,13 +3,13 @@ return {
 	opts = {},
 	-- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
 	-- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-	 dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-	 config = function()
+	dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+	config = function()
 		require('render-markdown').setup({
-			render_modes= {'i', 'v', 'n' ,'c'},
-			file_types = {'markdown', 'vimwiki'},
-
+			render_modes = { 'n' }, -- Only render in normal mode to avoid slow file loading
+			file_types = { 'markdown', 'vimwiki' },
+			max_file_size = 1.5, -- Disable for files > 1.5 MB
 		})
-			vim.treesitter.language.register('markdown', 'vimwiki')
-	 end
+		vim.treesitter.language.register('markdown', 'vimwiki')
+	end
 }
