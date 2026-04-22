@@ -10,9 +10,9 @@ return {
 		'DBUIAddConnection',
 		'DBUIFindBuffer',
 	},
-	config = function()
-		vim.keymap.set('n', '<Leader>Y', '<Plug>(DBUI_SaveQuery)', { remap = true } )
-	end,
+	keys = {
+		{ '<Leader>Y', '<Plug>(DBUI_SaveQuery)', desc = 'DBUI save query' },
+	},
 	init = function()
 		-- Your DBUI configuration
 		vim.g.db_ui_use_nerd_fonts = 1

@@ -1,5 +1,6 @@
 return {
 	"sphamba/smear-cursor.nvim",
+	event = "VeryLazy",
 
 	opts = {
 		-- Smear cursor when switching buffers or windows.

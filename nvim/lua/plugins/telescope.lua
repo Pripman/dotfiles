@@ -1,18 +1,29 @@
 return {
 	"nvim-telescope/telescope.nvim",
+	cmd = "Telescope",
+	dependencies = {
+		"nvim-lua/plenary.nvim",
+		"nvim-telescope/telescope-ui-select.nvim",
+	},
+	keys = {
+		{ "<leader>ff", function() require("telescope.builtin").find_files() end,     desc = "Find files" },
+		{ "<leader>fb", function() require("telescope.builtin").buffers() end,        desc = "Find buffers" },
+		{ "<leader>fg", function() require("telescope.builtin").live_grep() end,      desc = "Live grep" },
+		{ "<leader>fh", function() require("telescope.builtin").help_tags() end,      desc = "Help tags" },
+		{ "<leader>fs", function() require("telescope.builtin").git_status() end,     desc = "Git status" },
+		{ "<leader>gb", function() require("telescope.builtin").git_branches() end,   desc = "Git branches" },
+		{ "<leader>fr", function() require("telescope.builtin").lsp_references() end, desc = "LSP references", noremap = true, silent = true },
+		{ "<leader>fw", function() require("telescope.builtin").find_files({ cwd = "~/vimwiki" }) end, desc = "Find vimwiki files" },
+	},
 	config = function()
-		local builtin = require('telescope.builtin')
-		vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-		vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-		vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-		vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-		vim.keymap.set('n', '<leader>fs', builtin.git_status, {})
-		vim.keymap.set('n', '<leader>gb', builtin.git_branches, {})
-		vim.keymap.set('n', '<leader>fr', builtin.lsp_references, { noremap = true, silent = true })
-		vim.keymap.set('n', '<leader>fw', function()
-			builtin.find_files({ cwd = "~/vimwiki" })
-		end)
+		local telescope = require("telescope")
+		telescope.setup({
+			extensions = {
+				["ui-select"] = {
+					require("telescope.themes").get_dropdown({}),
+				},
+			},
+		})
+		telescope.load_extension("ui-select")
 	end,
-	dependencies = { 'nvim-lua/plenary.nvim', as = "plenary" }
-
 }

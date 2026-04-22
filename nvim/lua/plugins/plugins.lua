@@ -1,8 +1,19 @@
 return {
-	"tpope/vim-fugitive",
-	"tpope/vim-commentary",
-	"xiyaowong/transparent.nvim",
-	"nvim-telescope/telescope.nvim",
-	"vimwiki/vimwiki",
-	"towolf/vim-helm",
+	{
+		"tpope/vim-commentary",
+		event = "VeryLazy",
+	},
+	{
+		"xiyaowong/transparent.nvim",
+		event = "VeryLazy",
+	},
+	{
+		"vimwiki/vimwiki",
+		cmd = { "VimwikiIndex", "VimwikiUISelect", "VimwikiMakeDiaryNote", "VimwikiTabIndex", "VimwikiDiaryIndex" },
+		ft = "vimwiki",
+	},
+	{
+		"towolf/vim-helm",
+		ft = "helm",
+	},
 }
