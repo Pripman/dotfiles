@@ -1,16 +1,10 @@
 -- general
 vim.cmd 'set number relativenumber'
 vim.cmd 'set nowrap'
-vim.cmd 'setlocal spell spelllang=en_us'
 
--- Needed for vim wiki
-vim.cmd [[
-	set nocompatible
-	filetype plugin on
-	syntax on
-	let g:vimwiki_list = [{'path': '~/vimwiki/', 'syntax': 'markdown', 'ext': 'md'}]
-	let g:vimwiki_global_ext = 1
-]]
+-- Vimwiki configuration
+vim.g.vimwiki_list = { { path = '~/vimwiki/', syntax = 'markdown', ext = 'md' } }
+vim.g.vimwiki_global_ext = 1
 -- adds transparency to the background
 vim.cmd [[
   highlight Normal guibg=none
@@ -79,6 +73,15 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
 		if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
 			vim.api.nvim_command('silent update')
 		end
+	end,
+})
+
+-- enable spell-check for prose filetypes
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "markdown", "vimwiki", "gitcommit" },
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en_us"
 	end,
 })
 
