@@ -1,69 +1,157 @@
-#!/bin/bash
-echo this will delete all previous dot files!! are you sure you want to install?
-echo Type \'y\' to accept otherwise type \'n\'
+#!/usr/bin/env bash
+# Bootstrap script for dotfiles. Written in bash because zsh may not be
+# installed yet — bash is universally available.
+set -euo pipefail
 
+REPO_EXPECTED_PATH="$HOME/repos/dotfiles"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-if [ ! $answer == "y" ]; then
+echo "This will delete and replace your existing dotfiles (~/.zshrc, ~/.tmux.conf, ~/.p10k.zsh, ~/.config/nvim)."
+echo -n "Type 'y' to continue, anything else to abort: "
+read -r answer
+if [[ "$answer" != "y" ]]; then
+    echo "Aborting."
     exit 0
-    echo "skipping installation..."
+fi
+
+if [[ "$SCRIPT_DIR" != "$REPO_EXPECTED_PATH" ]]; then
+    echo ""
+    echo "WARNING: This repo is at '$SCRIPT_DIR' but .zshrc expects it at '$REPO_EXPECTED_PATH'."
+    echo "Some references (e.g. .p10k.zsh source path) will silently fail."
+    echo -n "Continue anyway? (y/N): "
+    read -r cont
+    [[ "$cont" == "y" ]] || exit 1
 fi
 
 echo ""
+echo "Installing dependencies..."
 
-echo "installing dependencies"
-
-# Oh my zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-
-
-# Powerlevel10k theme
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-
-
-# If needed on other os add ways to install tmux, nvm and ripgrip
-if [[ $OSTYPE == 'darwin'* ]]; then
-	# Install Tmux
-	brew install tmux
-	# Install tmux package manager
-	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-	# install nvm
-	brew install nvm
-
-	# install ripgrep (dependency to teleskope plugin for neovim)
-	brew install ripgrep
+# -----------------------------------------------------------------------------
+# 1. Homebrew (macOS only, if missing)
+# -----------------------------------------------------------------------------
+if [[ "$OSTYPE" == darwin* ]] && ! command -v brew >/dev/null 2>&1; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Ensure brew is on PATH for the rest of this script
+    if [[ -x /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -x /usr/local/bin/brew ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
 fi
 
+# -----------------------------------------------------------------------------
+# 2. zsh (install if missing) + set as default shell
+# -----------------------------------------------------------------------------
+if ! command -v zsh >/dev/null 2>&1; then
+    echo "Installing zsh..."
+    if [[ "$OSTYPE" == darwin* ]]; then
+        brew install zsh
+    elif [[ "$OSTYPE" == linux* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y zsh
+    else
+        echo "Unsupported OS for automatic zsh install: $OSTYPE" >&2
+        exit 1
+    fi
+fi
 
+# Set zsh as default shell. Prefer system zsh on macOS (already in /etc/shells).
+ZSH_BIN="$(command -v zsh)"
+if [[ "$OSTYPE" == darwin* && -x /bin/zsh ]]; then
+    ZSH_BIN="/bin/zsh"
+fi
+if [[ "$SHELL" != "$ZSH_BIN" ]]; then
+    # Ensure $ZSH_BIN is registered in /etc/shells
+    if ! grep -qx "$ZSH_BIN" /etc/shells 2>/dev/null; then
+        echo "Registering $ZSH_BIN in /etc/shells (requires sudo)..."
+        echo "$ZSH_BIN" | sudo tee -a /etc/shells >/dev/null
+    fi
+    echo "Setting default shell to $ZSH_BIN..."
+    chsh -s "$ZSH_BIN" || echo "WARNING: chsh failed — set your default shell manually."
+fi
 
+# -----------------------------------------------------------------------------
+# 3. mise — universal version manager (replaces nvm + pyenv).
+# -----------------------------------------------------------------------------
+if ! command -v mise >/dev/null 2>&1 && [[ ! -x "$HOME/.local/bin/mise" ]]; then
+    echo "Installing mise..."
+    curl https://mise.run | sh
+fi
+if [[ ! -x "$HOME/.local/bin/mise" ]]; then
+    echo "ERROR: mise install failed — expected binary at ~/.local/bin/mise" >&2
+    exit 1
+fi
+"$HOME/.local/bin/mise" use --global node@lts python@latest || true
 
-SCRIPT_DIR=$(pwd)
+# -----------------------------------------------------------------------------
+# 4. Powerlevel10k theme (cross-platform)
+# -----------------------------------------------------------------------------
+if [[ ! -d "$HOME/powerlevel10k" ]]; then
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k"
+fi
+
+# zinit self-bootstraps from .zshrc on first shell start — no install needed here.
+
+# -----------------------------------------------------------------------------
+# 5. Platform-specific dependencies
+# -----------------------------------------------------------------------------
+if [[ "$OSTYPE" == darwin* ]]; then
+    brew install tmux ripgrep fzf
+    if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+elif [[ "$OSTYPE" == linux* ]]; then
+    sudo apt-get update
+    sudo apt-get install -y \
+        tmux \
+        ripgrep \
+        fzf \
+        git \
+        curl \
+        ninja-build gettext cmake unzip build-essential
+
+    if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+
+    # Build and install latest neovim from source into ~/.local
+    if [[ ! -x "$HOME/.local/bin/nvim" ]]; then
+        echo "Building neovim from source..."
+        if [[ ! -d "$HOME/neovim" ]]; then
+            git clone https://github.com/neovim/neovim.git "$HOME/neovim"
+        fi
+        (
+            cd "$HOME/neovim"
+            git checkout stable
+            make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$HOME/.local"
+            make install
+        )
+    fi
+fi
+
+# -----------------------------------------------------------------------------
+# 6. Symlinks
+# -----------------------------------------------------------------------------
 echo "Using script dir: $SCRIPT_DIR"
-echo "Using home dir: $HOME"
+echo "Using home dir:   $HOME"
 
-if [ -e $HOME/.config/nvim ]; then
-	rm -r $HOME/.config/nvim
-	echo "Removing nvim folder"
-fi
-if [ -e "$HOME/.zshrc" ]; then
-	rm $HOME/.zshrc
-	echo "Removing zshrc file"
-fi
-if [ -e "$HOME/.tmux.conf" ]; then
-	rm $HOME/.tmux.conf
-	echo "Removing tmux file"
-fi
-if [ -e "$HOME/.p10k.zsh" ]; then
-	rm -r $HOME/.p10k.zsh
-	echo "Removing p10k folder"
-fi
+link() {
+    local src="$1" dest="$2"
+    if [[ -e "$dest" || -L "$dest" ]]; then
+        rm -rf "$dest"
+        echo "Removed existing $dest"
+    fi
+    mkdir -p "$(dirname "$dest")"
+    ln -s "$src" "$dest"
+    echo "Linked $dest -> $src"
+}
 
-echo "Setting up symbolic links"
+link "$SCRIPT_DIR/nvim"        "$HOME/.config/nvim"
+link "$SCRIPT_DIR/.zshrc"      "$HOME/.zshrc"
+link "$SCRIPT_DIR/.tmux.conf"  "$HOME/.tmux.conf"
+link "$SCRIPT_DIR/.p10k.zsh"   "$HOME/.p10k.zsh"
 
-ln -s $SCRIPT_DIR/nvim $HOME/.config/nvim
-ln -s $SCRIPT_DIR/.zshrc $HOME/.zshrc
-ln -s $SCRIPT_DIR/.tmux.conf $HOME/.tmux.conf
-ln -s $SCRIPT_DIR/.p10k.zsh $HOME/.p10k.zsh
+echo ""
+echo "Done. Open a new terminal (zsh) to apply changes."
+echo "First shell startup will be slower (~3-5s) while zinit clones plugins; subsequent shells will be fast."
