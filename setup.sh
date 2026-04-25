@@ -151,6 +151,7 @@ link "$SCRIPT_DIR/nvim"        "$HOME/.config/nvim"
 link "$SCRIPT_DIR/.zshrc"      "$HOME/.zshrc"
 link "$SCRIPT_DIR/.tmux.conf"  "$HOME/.tmux.conf"
 link "$SCRIPT_DIR/.p10k.zsh"   "$HOME/.p10k.zsh"
+link "$SCRIPT_DIR/ghostty"     "$HOME/.config/ghostty"
 
 echo ""
 echo "Done. Open a new terminal (zsh) to apply changes."

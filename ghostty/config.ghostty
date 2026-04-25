@@ -1,0 +1,6 @@
+theme = Rose Pine
+background-image = ~/.config/ghostty/rose-pine.jpg
+background-image-fit = stretch
+background-image-opacity = 0.2
+shell-integration-features = ssh-env
+shell-integration-features = ssh-terminfo
