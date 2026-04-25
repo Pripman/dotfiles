@@ -1,5 +1,9 @@
 return {
 	"lewis6991/gitsigns.nvim",
+	event = { "BufReadPre", "BufNewFile" },
+	keys = {
+		{ "<leader>gd", "<cmd>Gitsigns preview_hunk<cr>", desc = "Preview hunk popup" },
+	},
 	config = function()
 		require('gitsigns').setup {
 			signs = {
@@ -41,6 +45,5 @@ return {
 				col = 1
 			},
 		}
-		vim.keymap.set("n", "<leader>gd", '<cmd>:Gitsigns preview_hunk_inline<cr>', {remap = false})
 	end,
 }

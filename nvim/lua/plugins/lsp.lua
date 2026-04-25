@@ -1,15 +1,20 @@
 return {
 	{
 		'VonHeikemen/lsp-zero.nvim',
+		branch = 'v3.x',
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
-			{
-				"williamboman/mason-lspconfig.nvim",
-				dependencies = {
-					"williamboman/mason.nvim",
-				}
-			},
-			"j-hui/fidget.nvim",
+			{ "williamboman/mason.nvim" },
+			{ "williamboman/mason-lspconfig.nvim" },
+			{ "neovim/nvim-lspconfig" },
+			{ "j-hui/fidget.nvim" },
+			{ "hrsh7th/nvim-cmp" },
+			{ "hrsh7th/cmp-nvim-lsp" },
+			{ "hrsh7th/cmp-path" },
+			{ "hrsh7th/cmp-buffer" },
+			{ "hrsh7th/cmp-nvim-lua" },
+			{ "hrsh7th/cmp-nvim-lsp-signature-help" },
+			{ "L3MON4D3/LuaSnip" },
 		},
 		config = function()
 			local lsp_zero = require('lsp-zero')
@@ -27,9 +32,6 @@ return {
 				-- Replace the language servers listed here
 				-- with the ones you want to install
 				ensure_installed = { 'yamlls', 'eslint', 'lua_ls', 'typos_lsp', 'graphql', 'marksman', 'docker_compose_language_service', 'ruff', 'biome', 'helm_ls', 'pyright', 'tsgo' },
-				handlers = {
-					lsp_zero.default_setup,
-				}
 			})
 
 			vim.lsp.enable("tsgo")
@@ -118,8 +120,6 @@ return {
 
 			local cmp = require 'cmp'
 
-
-
 			cmp.setup({
 
 				sources = cmp.config.sources({
@@ -154,19 +154,6 @@ return {
 					{ name = 'buffer' },
 				}
 			})
-			cmp.setup.filetype('typescript', {
-				sources = {
-					{ name = "nvim_lsp",               keyword_length = 1 },
-					{ name = "nvim_lsp_signature_help" },
-					{ name = "path" },
-					{ name = "nvim_lua" }
-				}
-			})
 		end,
-		branch = 'v3.x'
 	},
-	{ 'neovim/nvim-lspconfig' },
-	{ "hrsh7th/nvim-cmp" },
-	{ 'hrsh7th/cmp-nvim-lsp' },
-	{ "L3MON4D3/LuaSnip" }
 }
