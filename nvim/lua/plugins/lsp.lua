@@ -154,6 +154,7 @@ return {
 					{ name = 'buffer' },
 				}
 			})
+			cmp.setup.filetype({ 'markdown', 'vimwiki' }, { enabled = false })
 		end,
 	},
 }
