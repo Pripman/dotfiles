@@ -161,6 +161,18 @@ function decode_jwt() {
 
 
 # =============================================================================
+# keyboard_nav — global app-focus shortcuts (macOS only)
+# =============================================================================
+if [[ "$OSTYPE" == darwin* ]]; then
+    if ! pgrep -qf "keyboard_nav.py" 2>/dev/null; then
+        nohup python3 "$HOME/repos/dotfiles/keyboard_nav/keyboard_nav.py" \
+            > /dev/null 2>&1 &
+        disown
+    fi
+fi
+
+
+# =============================================================================
 # Cargo / Rust env (from rustup installer)
 # =============================================================================
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"

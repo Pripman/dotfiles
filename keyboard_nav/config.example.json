@@ -1,0 +1,34 @@
+{
+  "mappings": [
+    {
+      "shortcut": "command+1",
+      "bundleId": "com.mitchellh.ghostty",
+      "comment": "Ghostty terminal"
+    },
+    {
+      "shortcut": "command+2",
+      "bundleId": "com.google.Chrome",
+      "comment": "Google Chrome"
+    },
+    {
+      "shortcut": "command+3",
+      "bundleId": "com.apple.Safari",
+      "comment": "Safari"
+    },
+    {
+      "shortcut": "command+4",
+      "bundleId": "com.tinyspeck.slackmacgap",
+      "comment": "Slack"
+    },
+    {
+      "shortcut": "command+5",
+      "bundleId": "com.spotify.client",
+      "comment": "Spotify"
+    },
+    {
+      "shortcut": "command+control+1",
+      "bundleId": "com.apple.finder",
+      "comment": "Finder (example of multi-modifier)"
+    }
+  ]
+}

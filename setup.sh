@@ -101,6 +101,8 @@ if [[ "$OSTYPE" == darwin* ]]; then
     if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
         git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
     fi
+    echo "Installing keyboard_nav Python dependencies..."
+    pip install -r "$SCRIPT_DIR/keyboard_nav/requirements.txt"
 elif [[ "$OSTYPE" == linux* ]]; then
     sudo apt-get update
     sudo apt-get install -y \
