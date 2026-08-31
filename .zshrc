@@ -167,11 +167,40 @@ function decode_jwt() {
 # keyboard_nav — global app-focus shortcuts (macOS only)
 # =============================================================================
 if [[ "$OSTYPE" == darwin* ]]; then
-    if ! pgrep -qf "keyboard_nav.py" 2>/dev/null; then
+    _kn_dir="$HOME/.cache/keyboard_nav"
+    _kn_pid="$_kn_dir/keyboard_nav.pid"
+    _kn_hb="$_kn_dir/keyboard_nav.heartbeat"
+    _kn_log="$_kn_dir/keyboard_nav.log"
+    mkdir -p "$_kn_dir"
+
+    _kn_healthy=0
+    if [[ -f "$_kn_pid" ]] && kill -0 "$(cat "$_kn_pid" 2>/dev/null)" 2>/dev/null; then
+        if [[ -f "$_kn_hb" ]]; then
+            # macOS stat: seconds since heartbeat mtime
+            _kn_age=$(( $(date +%s) - $(stat -f %m "$_kn_hb") ))
+            (( _kn_age < 60 )) && _kn_healthy=1
+        fi
+    fi
+
+    if (( ! _kn_healthy )); then
+        # Clean up unhealthy/stale instance
+        if [[ -f "$_kn_pid" ]]; then
+            _kn_old_pid=$(cat "$_kn_pid" 2>/dev/null)
+            if [[ -n "$_kn_old_pid" ]] && kill -0 "$_kn_old_pid" 2>/dev/null; then
+                echo "[keyboard_nav] previous instance unhealthy, relaunching"
+                kill "$_kn_old_pid" 2>/dev/null
+            fi
+            rm -f "$_kn_pid"
+        fi
+        # Rotate log if > 1MB
+        if [[ -f "$_kn_log" ]] && (( $(stat -f %z "$_kn_log") > 1048576 )); then
+            mv "$_kn_log" "$_kn_log.old"
+        fi
         nohup python3 "$HOME/repos/dotfiles/keyboard_nav/keyboard_nav.py" \
-            > /dev/null 2>&1 &
+            >> "$_kn_log" 2>&1 &
         disown
     fi
+    unset _kn_dir _kn_pid _kn_hb _kn_log _kn_healthy _kn_age _kn_old_pid
 fi
 
 

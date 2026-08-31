@@ -16,8 +16,11 @@ What happens on startup:
   5. Menu bar app   — runs the rumps event loop on the main thread (required by AppKit).
 """
 
+import atexit
+import os
 import sys
 import threading
+import time
 
 # ---------------------------------------------------------------------------
 # Dependency guard — give a clear message before pyobjc crashes
@@ -45,10 +48,55 @@ from menu_bar import (
 
 
 # ---------------------------------------------------------------------------
+# PID + heartbeat (consumed by .zshrc health check)
+# ---------------------------------------------------------------------------
+_CACHE_DIR = os.path.expanduser("~/.cache/keyboard_nav")
+_PID_FILE = os.path.join(_CACHE_DIR, "keyboard_nav.pid")
+_HEARTBEAT_FILE = os.path.join(_CACHE_DIR, "keyboard_nav.heartbeat")
+_HEARTBEAT_INTERVAL_SEC = 15
+
+
+def _write_pid_file() -> None:
+    os.makedirs(_CACHE_DIR, exist_ok=True)
+    with open(_PID_FILE, "w") as f:
+        f.write(str(os.getpid()))
+    atexit.register(_remove_pid_file)
+
+
+def _remove_pid_file() -> None:
+    try:
+        if os.path.exists(_PID_FILE):
+            with open(_PID_FILE) as f:
+                if f.read().strip() == str(os.getpid()):
+                    os.remove(_PID_FILE)
+    except OSError:
+        pass
+
+
+def _start_heartbeat() -> None:
+    """Touch heartbeat file every N seconds. Started only after tap is healthy."""
+    os.makedirs(_CACHE_DIR, exist_ok=True)
+
+    def _loop():
+        while True:
+            try:
+                with open(_HEARTBEAT_FILE, "a"):
+                    os.utime(_HEARTBEAT_FILE, None)
+            except OSError:
+                pass
+            time.sleep(_HEARTBEAT_INTERVAL_SEC)
+
+    threading.Thread(target=_loop, daemon=True).start()
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    # --- PID file (so .zshrc guard can detect a live instance) --------------
+    _write_pid_file()
+
     # --- Load config --------------------------------------------------------
     try:
         mappings = load_config()
@@ -78,6 +126,10 @@ def main() -> None:
             "[keyboard_nav] Failed to create CGEventTap even though Accessibility "
             "permission appears granted. Try restarting the app."
         )
+
+    # --- Heartbeat (only if tap is actually working) -------------------------
+    if tap_started:
+        _start_heartbeat()
 
     # --- Reload callback (wired into menu bar) --------------------------------
     def on_reload():

@@ -35,9 +35,10 @@ def focus_or_launch(bundle_id: str) -> None:
 
 def _launch(bundle_id: str, url: str | None = None) -> None:
     """Launch an app by bundle ID using 'open -b', optionally with a URL."""
-    cmd = ["open", "-b", bundle_id]
     if url:
-        cmd.append(url)
+        cmd = ["open", url, "-b", bundle_id]
+    else:
+        cmd = ["open", "-b", bundle_id]
     subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -103,6 +104,7 @@ def focus_or_launch_url(bundle_id: str, url: str) -> None:
         text=True,
     )
     if result.returncode != 0:
+        print(f"[keyboard_nav] AppleScript failed (rc={result.returncode}): {result.stderr.strip()}")
         # Fallback: just bring Chrome to front if AppleScript fails
         running[0].activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
 
