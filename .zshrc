@@ -114,6 +114,7 @@ alias n="nvim ."
 alias nconf="cd ~/.config/nvim && nvim ."
 alias py="python3"
 alias pip="python3 -m pip"
+alias o="opencode --auto"
 
 export EDITOR="nvim"
 export MYVIMRC="~/.config/nvim"
