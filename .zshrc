@@ -49,8 +49,10 @@ if [[ ! -d "$ZINIT_HOME" ]]; then
 fi
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Plugins — heavy ones deferred until after the prompt is painted (wait'0a')
-zinit ice wait'0a' lucid
+# zsh-autosuggestions is loaded eagerly on purpose. It wraps the ZLE widgets from
+# a precmd hook, so under turbo (wait'...') it loads after the first prompt is
+# already drawn and inline suggestions only start working after the first Enter.
+# Sourcing it costs ~5ms, hidden behind the p10k instant prompt anyway.
 zinit light zsh-users/zsh-autosuggestions
 
 zinit ice wait'0b' lucid atinit'zicompinit; zicdreplay'
