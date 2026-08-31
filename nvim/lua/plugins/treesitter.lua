@@ -1,49 +1,55 @@
+-- nvim-treesitter `main` branch (Neovim 0.12+).
+-- No more `configs.setup`; highlighting/folds/indent are opt-in per filetype.
 return {
 	'nvim-treesitter/nvim-treesitter',
-	event = { "BufReadPost", "BufNewFile" },
-	cmd = { "TSUpdate", "TSInstall", "TSInstallInfo", "TSUpdateSync", "TSModuleInfo", "TSBufEnable", "TSBufDisable" },
-	build = ":TSUpdate",
+	branch = 'main',
+	lazy = false, -- main branch does not support lazy-loading
+	build = ':TSUpdate',
 	config = function()
-		require 'nvim-treesitter.configs'.setup {
-			-- A list of parser names, or "all" (the five listed parsers should always be installed)
-			ensure_installed = { "c", "lua", "python", "javascript", "typescript", "tsx", "vim", "vimdoc", "query", "yaml", "graphql", "markdown", "markdown_inline" },
+		require('nvim-treesitter').setup({
+			install_dir = vim.fn.stdpath('data') .. '/site',
+		})
 
-			-- Install parsers synchronously (only applied to `ensure_installed`)
-			sync_install = false,
-
-			-- Automatically install missing parsers when entering buffer
-			-- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-			auto_install = false,
-
-			-- List of parsers to ignore installing (or "all")
-			-- ignore_install = { "javascript" },
-
-			---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
-			-- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
-
-			highlight = {
-				enable = true,
-
-				-- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
-				-- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
-				-- the name of the parser)
-				-- list of language that will be disabled
-				disable = { "c", "rust" },
-				-- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-				disable = function(lang, buf)
-					local max_filesize = 100 * 1024 -- 100 KB
-					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-					if ok and stats and stats.size > max_filesize then
-						return true
-					end
-				end,
-
-				-- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-				-- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-				-- Using this option may slow down your editor, and you may see some duplicate highlights.
-				-- Instead of true it can also be a list of languages
-				additional_vim_regex_highlighting = false,
-			},
+		local ensure_installed = {
+			'c', 'lua', 'python', 'javascript', 'typescript', 'tsx',
+			'vim', 'vimdoc', 'query', 'yaml', 'graphql',
+			'markdown', 'markdown_inline',
 		}
-	end
+		-- Only install missing parsers (avoids rebuild churn on every startup).
+		local installed = require('nvim-treesitter.config').get_installed('parsers')
+		local have = {}
+		for _, p in ipairs(installed) do have[p] = true end
+		local missing = {}
+		for _, p in ipairs(ensure_installed) do
+			if not have[p] then table.insert(missing, p) end
+		end
+		if #missing > 0 then
+			require('nvim-treesitter').install(missing)
+		end
+
+		-- Filetypes to enable treesitter highlighting for.
+		-- Map filetype -> parser name (nil = same as filetype).
+		local ft_to_parser = {
+			c = 'c', lua = 'lua', python = 'python',
+			javascript = 'javascript', typescript = 'typescript',
+			typescriptreact = 'tsx', javascriptreact = 'javascript',
+			vim = 'vim', help = 'vimdoc', query = 'query',
+			yaml = 'yaml', graphql = 'graphql',
+			markdown = 'markdown', vimwiki = 'markdown',
+		}
+
+		local max_filesize = 100 * 1024 -- 100 KB
+		vim.api.nvim_create_autocmd('FileType', {
+			pattern = vim.tbl_keys(ft_to_parser),
+			callback = function(args)
+				local buf = args.buf
+				local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+				if ok and stats and stats.size > max_filesize then
+					return
+				end
+				local parser = ft_to_parser[args.match]
+				pcall(vim.treesitter.start, buf, parser)
+			end,
+		})
+	end,
 }
